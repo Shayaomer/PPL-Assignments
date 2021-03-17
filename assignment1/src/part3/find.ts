@@ -1,3 +1,4 @@
+import *  as R from "ramda";
 import { Result, makeFailure, makeOk, bind, either } from "../lib/result";
 
 /* Library code */
@@ -8,7 +9,12 @@ const findOrThrow = <T>(pred: (x: T) => boolean, a: T[]): T => {
     throw "No element found.";
 }
 
-export const findResult = undefined;
+export const findResult = <T>(pred: (x: T) => boolean , arr: T[], message : string):Result<T> => {
+    return arr.some(pred) ? makeOk(arr.filter(pred)[0]) : makeFailure(message);
+    
+};
+
+
 
 /* Client code */
 const returnSquaredIfFoundEven_v1 = (a: number[]): number => {
@@ -20,6 +26,10 @@ const returnSquaredIfFoundEven_v1 = (a: number[]): number => {
     }
 }
 
-export const returnSquaredIfFoundEven_v2 = undefined;
+export const returnSquaredIfFoundEven_v2 = (arr : number[]) : Result<number> => {
+    return bind(findResult(x=>x%2==0, arr, "Failure"), x => makeOk(x*x));
+};
 
-export const returnSquaredIfFoundEven_v3 = undefined;
+export const returnSquaredIfFoundEven_v3 = (arr : number[]) : number =>{
+    return either(findResult(x => x%2 == 0, arr, '-1'), x => (x*x), x => (-1))
+}
