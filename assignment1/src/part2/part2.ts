@@ -8,29 +8,41 @@ export const countVowels = (input : string) : number => {return stringToArray(in
 
 
 const vowelCheck: (letter: string) => boolean = (letter) => {
-    if('aeiou'.indexOf(letter.toLowerCase()) !== -1)
-        return true
-    return false
+    return ('aeiou'.indexOf(letter.toLowerCase()) !== -1)
 } 
 
 /* Question 2 */
-export const runLengthEncoding = (input : string) : string => {
-    return R.groupWith(R.equals,stringToArray(input)).reduce((acc : string, cur : string[]):string =>cur.length >1? acc + cur[0]+cur.length : acc + cur[0],'')
-};
+export const runLengthEncoding: (input : string) => string = (input : string) =>
+{
+    return R.groupWith(R.equals, stringToArray(input)).reduce((acc : string, cur : string[]):string =>cur.length >1? acc + cur[0]+cur.length : acc + cur[0],'')
+}
+;
 
-/* Question 3 */
-export const isPaired = (text : string) : boolean => {
-    const input = stringToArray(text);
-    const arr1 : number[] = R.scan((acc:number, cur:string) => cur === '{'? acc = acc +1 : cur === '}'? acc = acc -1: acc, 0 ,input)
-    if(arr1.indexOf(-1) !== -1)
-        return false;
-        const arr2 : number[] = R.scan((acc:number, cur:string) => cur === '('? acc = acc +1 : cur === ')'? acc = acc -1: acc, 0 ,input)
-    if(arr2.indexOf(-1) !== -1)
-        return false;
-        const arr3 : number[] = R.scan((acc:number, cur:string) => cur === '['? acc = acc +1 : cur === ']'? acc = acc -1: acc, 0 ,input)
-    if(arr3.indexOf(-1) !== -1)
-        return false;
-    return (R.last(arr1) === 0 && R.last(arr2) === 0 && R.last(arr1) === 0);    
-};
-console.log(isPaired("((([[[{{{)}])}]]})"));
+
+
+/* Question 3*/
+export const isPaired = 
+    R.pipe((input : string)=> stringToArray(input),
+        (input :string[]) => R.filter((z: string)=> "(){}[]".indexOf(z)!== -1, input),
+        (input: string []) => R.reduce((acc:string[], cur: string)=> cur === '}' || cur === ')' || cur === ']'? 
+            acc[0] === paranth[cur] ? 
+                acc = acc.slice(1): 
+                acc = acc.concat('F') :
+            acc = [cur].concat(acc), [], input),
+        (y : string[]) => {return y.length ===0});
+    
+interface par {
+    '}' : string,
+    ')' : string,
+    ']' : string
+    
+}
+const paranth : par= {
+    '}' : '{',
+    ')' : '(',
+    ']' : '['
+}
+
+
+console.log(isPaired("({[asd(s[)]dad]})"));
 
