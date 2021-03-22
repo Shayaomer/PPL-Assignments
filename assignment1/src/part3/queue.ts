@@ -12,3 +12,4 @@ export const dequeue:State<Queue,number> =  (q) => {
 
 export const queueManip:State<Queue, number> = 
     bind(dequeue, x => bind(enqueue(2*x), () => bind(enqueue(x/3), ()=> dequeue)));
+    

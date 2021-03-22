@@ -44,5 +44,3 @@ const paranth : par= {
 }
 
 
-console.log(isPaired("({[asd(s[)]dad]})"));
-
