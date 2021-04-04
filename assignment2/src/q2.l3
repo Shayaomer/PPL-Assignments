@@ -4,11 +4,21 @@
   )
 )
 
-(define reverse 
-  (lambda (lst)
-        @TODO
+(define reverse-list
+  (lambda (lst1 lst2)
+    (if (eq? lst1 '()) lst2 
+      (reverse-list (cdr lst1) (cons (car lst1) lst2))
+    )
   )
 )
+
+(define reverse 
+  (lambda (lst)
+      (reverse-list lst '())
+  )
+)
+
+
 
 (define duplicate-items
    (lambda(lst dup-count)
@@ -19,8 +29,27 @@
 
 (define payment
   (lambda (n coins-lst)
-        @TODO
+        (if (< n 0) 0
+          (if (eq? coins-lst '())
+            (if (= n 0) 1 0)
+            (+ 
+              (payment (- n (car coins-lst)) (cdr coins-lst)) 
+              (payment n (skip (car coins-lst) coins-lst))
+            )
+          )
+        )
   )
+)
+
+(define skip
+  (lambda (n lst)
+    (if (eq? lst '()) lst    
+      (if (= n (car lst))
+        (skip n (cdr lst))
+        lst
+      )
+    )
+  )  
 )
                                
 (define compose-n
