@@ -41,14 +41,6 @@
 )
 
 
-
-(define duplicate-items
-   (lambda(lst dup-count)
-      @TODO
-   )
-)
-
-
 (define payment
   (lambda (n coins-lst)
         (if (< n 0) 0
