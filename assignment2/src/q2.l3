@@ -1,8 +1,8 @@
-(define append 
-  (lambda(lst1 lst2)
-      @TODO
-  )
-)
+(define append
+  (lambda (lst1 lst2)
+    (if (empty? lst1)
+        lst2
+        (cons (car lst1) (append (cdr lst1) lst2)))))
 
 (define reverse-list
   (lambda (lst1 lst2)
