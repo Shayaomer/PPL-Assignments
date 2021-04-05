@@ -46,7 +46,7 @@
     (if (eq? lst '()) lst    
       (if (= n (car lst))
         (skip n (cdr lst))
-        lst
+        (cons (car lst) (skip n (cdr lst)))
       )
     )
   )  
