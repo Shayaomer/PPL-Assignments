@@ -1,6 +1,13 @@
+(define append
+  (lambda (lst1 lst2)
+    (if (eq? lst1 '())
+        lst2
+        (cons (car lst1) (append (cdr lst1) lst2)))))
+
+
 (define length
   (lambda (lst)
-    (if (empty? lst)
+    (if (eq? lst '())
         0
         (+ 1 (length (cdr lst))))))
 
@@ -12,7 +19,7 @@
   (lambda(lst dup-count)
     (if (< (length dup-count) (length lst))
         (duplicate-items lst (append dup-count dup-count))
-        (if (empty? lst)
+        (if (eq? lst '())
             lst
             (if (= (car dup-count) 0)
                 (duplicate-items (cdr lst) (cdr dup-count))
