@@ -229,7 +229,7 @@ const parseProcExp = (vars: Sexp, body: Sexp[]): Result<ProcExp> =>
 
 //implement
 const parseClassExp = (vars: Sexp, bindings: Sexp): Result<ClassExp> => {
-    bindings = bindings[0]
+    bindings = bindings [0]
     if ( !(isArray(vars) && allT(isString, vars)))
     {
         return makeFailure("Failed Class vars")
@@ -238,7 +238,7 @@ const parseClassExp = (vars: Sexp, bindings: Sexp): Result<ClassExp> => {
         return makeFailure('Malformed bindings in "ClassExp" expression');
     }
     const bindVars = map(b => b[0], bindings);
-    const valsResult = mapResult(binding => parseL31CExp(second(binding)), bindings);
+    const valsResult = mapResult(binding => parseProcExp(second(binding)[1], [second(binding)[2]]), bindings);
     const bindingsResult = bind(valsResult, (vals: CExp[]) => makeOk(zipWith(makeBinding, bindVars, vals))); 
     return bind(bindingsResult, (binds: Binding[]) => makeOk(makeClassExp(map(makeVarDecl, vars), binds)));
 }
