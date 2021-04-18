@@ -126,7 +126,7 @@ export const isAtomicExp = (x: any): x is AtomicExp =>
     isNumExp(x) || isBoolExp(x) || isStrExp(x) ||
     isPrimOp(x) || isVarRef(x);
 export const isCompoundExp = (x: any): x is CompoundExp =>
-    isAppExp(x) || isIfExp(x) || isProcExp(x) || isLitExp(x) || isLetExp(x);
+    isAppExp(x) || isIfExp(x) || isProcExp(x) || isLitExp(x) || isLetExp(x) || isClassExp(x);
 export const isCExp = (x: any): x is CExp =>
     isAtomicExp(x) || isCompoundExp(x);
 
@@ -148,7 +148,7 @@ const parseL31GoodProgram = (keyword: Sexp, body: Sexp[]): Result<Program> =>
     makeFailure("Program must be of the form (L31 <exp>+)");
 
 // Exp -> <DefineExp> | <Cexp>
-export const parseL31Exp = (sexp: Sexp): Result<Exp> =>
+export const parseL31Exp = (sexp: Sexp): Result<Exp> => 
     isEmpty(sexp) ? makeFailure("Exp cannot be an empty list") :
     isArray(sexp) ? parseL31CompoundExp(first(sexp), rest(sexp)) :
     isToken(sexp) ? parseL31Atomic(sexp) :
