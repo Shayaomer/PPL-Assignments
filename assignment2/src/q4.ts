@@ -41,8 +41,8 @@ const unparseAppExp = (ae : AppExp) : string =>
     `${unparseL2ToPython(ae.rator)}(${map(unparseL2ToPython, ae.rands).join(",")})`;
 
 const parsePrim = (rat : PrimOp, rands : CExp[]) : string =>
-    rat.op == "boolean?" ? `((lambda x : (type(x)) == bool) (${map(unparseL2ToPython,rands).join(",")}))` : 
-    rat.op == "number?" ? `((lambda x : (type(x)) == int || type(x) == float) (${map(unparseL2ToPython,rands).join(",")}))` : 
+    rat.op == "boolean?" ? `((lambda x : (type(x) == bool)) (${map(unparseL2ToPython,rands).join(",")}))` : 
+    rat.op == "number?" ? `((lambda x : (type(x) == int or type(x) == float)) (${map(unparseL2ToPython,rands).join(",")}))` : 
     rat.op == "eq?" || rat.op == "=" ? `(${map(unparseL2ToPython, rands).join(" == ")})`:
     rat.op == "not" ? `(not ${map(unparseL2ToPython, rands).join(" ")})`: "";
 
