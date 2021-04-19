@@ -24,20 +24,10 @@ const statementMaker = (exp: Binding[]): CExp =>
 {  
     const test : CExp = makeAppExp(makePrimOp('eq?'), [makeVarRef("msg"), makeLitExp(`'${first(exp).var.var}`)]); 
     if(rest(exp).length != 0){
-        const a = first(exp).val
-        if (isProcExp(a)) {
-            return makeIfExp(test, makeAppExp(makeProcExp(a.args, a.body),[]), statementMaker(rest(exp)));
-        }
-        else
-            return makeIfExp(test, first(exp).val, statementMaker(rest(exp)))
+        return makeIfExp(test, makeAppExp(first(exp).val,[]), statementMaker(rest(exp)));
     }
     else{
-        const a = first(exp).val
-        if (isProcExp(a)) {
-            return makeIfExp(test, makeAppExp(makeProcExp(a.args, a.body),[]), makeBoolExp(false))
-        }
-        else
-        return makeIfExp(test, first(exp).val, statementMaker(rest(exp)))
+        return makeIfExp(test, makeAppExp(first(exp).val,[]), makeBoolExp(false));
     }
 }
 /*
