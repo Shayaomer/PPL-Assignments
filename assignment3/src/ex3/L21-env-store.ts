@@ -17,18 +17,17 @@ export interface Store {
     vals: Box<Value>[];
 }
 
-export const isStore = ...;
-export const makeEmptyStore = ...;
-export const theStore: Store = 
-export const extendStore = (s: Store, val: Value): Store =>
-    // Complete
+export const isStore = (x: any): x is Store => x.tag === "Store";
+export const makeEmptyStore = () : Store => ({tag :"Store", vals: []});
+export const theStore: Store = makeEmptyStore();
+export const extendStore = (s: Store, val: Value): Store => 
+    ({tag: "Store", vals:[...s.vals, makeBox(val)]});
     
 export const applyStore = (store: Store, address: number): Result<Value> =>
-    // Complete
-
+    store.vals.length > address ?  makeOk(unbox(store.vals[address])) : makeFailure("address is not valid");
     
 export const setStore = (store: Store, address: number, val: Value): void => 
-    // Complete
+    address < store.vals.length ? setBox(store.vals[address], val) :  undefined
 
 
 // ========================================================
@@ -73,7 +72,10 @@ const applyGlobalEnv = (env: GlobalEnv, v: string): Result<number> =>
     // Complete
 
 export const globalEnvAddBinding = (v: string, addr: number): void =>
-    // Complete
+{
+    setBox(theGlobalEnv.vars, unbox(theGlobalEnv.vars).concat([v]));
+    setBox(theGlobalEnv.addresses,unbox(theGlobalEnv.addresses).concat([addr]));
+}
 
 const applyExtEnv = (env: ExtEnv, v: string): Result<number> =>
     env.vars.includes(v) ? makeOk(env.addresses[env.vars.indexOf(v)]) :
