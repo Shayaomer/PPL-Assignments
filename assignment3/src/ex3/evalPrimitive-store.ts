@@ -2,7 +2,7 @@ import { PrimOp } from "./L21-ast";
 import { Value, isSymbolSExp, isEmptySExp, isCompoundSExp, CompoundSExp, makeCompoundSExp, EmptySExp, makeEmptySExp } from "./L21-value-store";
 import { Result, makeOk, makeFailure } from "../shared/result";
 import { allT, first, rest } from "../shared/list";
-import { isNumber, isString, isBoolean } from "../shared/type-predicates";
+import { isNumber, isString, isBoolean, isNonZeroNumber } from "../shared/type-predicates";
 import { reduce } from "ramda";
 
 export const applyPrimitive = (proc: PrimOp, args: Value[]): Result<Value> =>
@@ -31,23 +31,14 @@ export const applyPrimitive = (proc: PrimOp, args: Value[]): Result<Value> =>
     makeFailure("Bad primitive op " + proc.op);
 
 const minusPrim = (args: Value[]): Result<number> => {
-    // TODO complete
-    const x = args[0], y = args[1];
-    if (isNumber(x) && isNumber(y)) {
-        return makeOk(x - y);
-    } else {
-        return makeFailure(`Type error: - expects numbers ${args}`)
-    }
+    return (allT(isNumber, args) && args.length > 0 ? 
+        makeOk(reduce((x: number, y: number) => x - y, 0, args)) : 
+        makeFailure(`- expects numbers only and at least one argument. Got ${args}`))
 }
 
 const divPrim = (args: Value[]): Result<number> => {
-    // TODO complete
-    const x = args[0], y = args[1];
-    if (isNumber(x) && isNumber(y)) {
-        return makeOk(x / y);
-    } else {
-        return makeFailure(`Type error: / expects numbers ${args}`)
-    }
+    return (allT(isNonZeroNumber, rest(args)) && allT(isNumber, args) && args.length > 0  ? makeOk(reduce((x, y) => x / y, 1, args)) : 
+    makeFailure(`/ expects non-zero-numbers only and at least one argument. Got ${args}`))
 }
 
 const eqPrim = (args: Value[]): boolean => {
