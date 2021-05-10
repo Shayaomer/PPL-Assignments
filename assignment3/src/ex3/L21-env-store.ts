@@ -1,6 +1,7 @@
 import { add, map, zipWith } from "ramda";
 import { Value } from './L21-value-store';
 import { Result, makeFailure, makeOk, bind, either } from "../shared/result";
+import { VarRef } from "./L21-ast";
 
 // ========================================================
 // Box datatype
@@ -14,20 +15,30 @@ const setBox = <T>(b: Box<T>, v: T): void => { b[0] = v; return; }
 // Store datatype
 export interface Store {
     tag: "Store";
-    vals: Box<Value>[];
+    vals: Box<Box<Value>[]>;
 }
 
 export const isStore = (x: any): x is Store => x.tag === "Store";
-export const makeEmptyStore = () : Store => ({tag :"Store", vals: []});
+export const makeEmptyStore = () : Store => ({tag :"Store", vals: makeBox([])});
 export const theStore: Store = makeEmptyStore();
 export const extendStore = (s: Store, val: Value): Store => 
-    ({tag: "Store", vals:[...s.vals, makeBox(val)]});
+{
+    setBox(theStore.vals, unbox(theStore.vals).concat(makeBox(val)));
+    return theStore;
+}
+
+export const extendStoreVals = (s: Store, vals: Value[]): Store =>
+{
+    setBox(theStore.vals, unbox(theStore.vals).concat(map((a : Value) => makeBox(a), vals)));
+    return theStore;
+}
+    
     
 export const applyStore = (store: Store, address: number): Result<Value> =>
-    store.vals.length > address ?  makeOk(unbox(store.vals[address])) : makeFailure("address is not valid");
+    store.vals.length > address ?  makeOk(unbox(unbox(store.vals)[address])) : makeFailure("address is not valid");
     
 export const setStore = (store: Store, address: number, val: Value): void => 
-    address < store.vals.length ? setBox(store.vals[address], val) :  undefined
+    address < store.vals.length ? setBox(unbox(store.vals)[address], val) :  undefined;
 
 
 // ========================================================
@@ -80,3 +91,6 @@ export const globalEnvAddBinding = (v: string, addr: number): void =>
 const applyExtEnv = (env: ExtEnv, v: string): Result<number> =>
     env.vars.includes(v) ? makeOk(env.addresses[env.vars.indexOf(v)]) :
     applyEnv(env.nextEnv, v);    //todo: stop condition, infinite loop
+
+export const applyEnvStore = (variable: string, env: Env): Result<Value> =>
+    bind(applyEnv(env, variable), (addr : number) => applyStore(theStore, addr));
