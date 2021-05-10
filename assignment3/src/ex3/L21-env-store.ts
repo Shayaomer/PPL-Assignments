@@ -69,7 +69,7 @@ export const applyEnv = (env: Env, v: string): Result<number> =>
     applyExtEnv(env, v);
 
 const applyGlobalEnv = (env: GlobalEnv, v: string): Result<number> => 
-    // Complete
+    unbox(env.vars).includes(v) ? makeOk(unbox(env.addresses)[unbox(env.vars).indexOf(v)]) : makeFailure("Not in GlobalEnv")   
 
 export const globalEnvAddBinding = (v: string, addr: number): void =>
 {
@@ -79,4 +79,4 @@ export const globalEnvAddBinding = (v: string, addr: number): void =>
 
 const applyExtEnv = (env: ExtEnv, v: string): Result<number> =>
     env.vars.includes(v) ? makeOk(env.addresses[env.vars.indexOf(v)]) :
-    applyEnv(env.nextEnv, v);
+    applyEnv(env.nextEnv, v);    //todo: stop condition, infinite loop
