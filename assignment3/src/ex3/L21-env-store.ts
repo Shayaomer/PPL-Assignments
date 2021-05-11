@@ -23,7 +23,7 @@ export const makeEmptyStore = () : Store => ({tag :"Store", vals: makeBox([])});
 export const theStore: Store = makeEmptyStore();
 export const extendStore = (s: Store, val: Value): Store => 
 {
-    setBox(theStore.vals, unbox(theStore.vals).concat(makeBox(val)));
+    setBox(theStore.vals, unbox(theStore.vals).concat([makeBox(val)]));
     return theStore;
 }
 
@@ -35,10 +35,10 @@ export const extendStoreVals = (s: Store, vals: Value[]): Store =>
     
     
 export const applyStore = (store: Store, address: number): Result<Value> =>
-    store.vals.length > address ?  makeOk(unbox(unbox(store.vals)[address])) : makeFailure("address is not valid");
+    unbox(store.vals).length > address ?  makeOk(unbox(unbox(store.vals)[address])) : makeFailure("address is not valid");
     
 export const setStore = (store: Store, address: number, val: Value): void => 
-    address < store.vals.length ? setBox(unbox(store.vals)[address], val) :  undefined;
+    address < unbox(store.vals).length ? setBox(unbox(store.vals)[address], val) :  undefined;
 
 
 // ========================================================

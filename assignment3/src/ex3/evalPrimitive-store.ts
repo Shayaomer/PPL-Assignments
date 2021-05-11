@@ -32,12 +32,12 @@ export const applyPrimitive = (proc: PrimOp, args: Value[]): Result<Value> =>
 
 const minusPrim = (args: Value[]): Result<number> => {
     return (allT(isNumber, args) && args.length > 0 ? 
-        makeOk(reduce((x: number, y: number) => x - y, 0, args)) : 
+        makeOk(reduce((x: number, y: number) => (x - y), first(args), rest(args))) : 
         makeFailure(`- expects numbers only and at least one argument. Got ${args}`))
 }
 
 const divPrim = (args: Value[]): Result<number> => {
-    return (allT(isNonZeroNumber, rest(args)) && allT(isNumber, args) && args.length > 0  ? makeOk(reduce((x, y) => x / y, 1, args)) : 
+    return (allT(isNonZeroNumber, rest(args)) && allT(isNumber, args) && args.length > 0  ? makeOk(reduce((x, y) => x / y, first(args), rest(args))) : 
     makeFailure(`/ expects non-zero-numbers only and at least one argument. Got ${args}`))
 }
 
