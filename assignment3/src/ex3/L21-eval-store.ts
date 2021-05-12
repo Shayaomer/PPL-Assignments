@@ -18,9 +18,7 @@ import { unbox } from "../shared/box";
 // Eval functions
 
 const applicativeEval = (exp: CExp, env: Env): Result<Value> =>
-{
-    
-    const a= isNumExp(exp) ? makeOk(exp.val) :
+    isNumExp(exp) ? makeOk(exp.val) :
     isBoolExp(exp) ? makeOk(exp.val) :
     isStrExp(exp) ? makeOk(exp.val) :
     isPrimOp(exp) ? makeOk(exp) :
@@ -33,9 +31,7 @@ const applicativeEval = (exp: CExp, env: Env): Result<Value> =>
                         (applicativeEval(exp.rator, env), mapResult((rand: CExp) => applicativeEval(rand, env), exp.rands)) :
     isSetExp(exp) ? evalSet(exp, env) :
     exp;
-   
-    return a;
-}
+
 export const isTrueValue = (x: Value): boolean =>
     ! (x === false);
 
@@ -47,21 +43,18 @@ const evalIf = (exp: IfExp, env: Env): Result<Value> =>
     bind(applicativeEval(exp.test, env),
          (test: Value) => isTrueValue(test) ? applicativeEval(exp.then, env) : applicativeEval(exp.alt, env));
 
-const evalProc = (exp: ProcExp, env: Env): Result<Closure> =>
-    
-{
-    
-    return makeOk(makeClosure(exp.args, exp.body, env));
+const evalProc = (exp: ProcExp, env: Env): Result<Closure> =>    
+    makeOk(makeClosure(exp.args, exp.body, env));
         
-}
+
 
 // KEY: This procedure does NOT have an env parameter.
 //      Instead we use the env of the closure.
-const applyProcedure = (proc: Value, args: Value[]): Result<Value> =>{
+const applyProcedure = (proc: Value, args: Value[]): Result<Value> =>
     
-    return isPrimOp(proc) ? applyPrimitive(proc, args) :
+    isPrimOp(proc) ? applyPrimitive(proc, args) :
     isClosure(proc) ? applyClosure(proc, args) :
-    makeFailure(`Bad procedure ${JSON.stringify(proc)}`);}
+    makeFailure(`Bad procedure ${JSON.stringify(proc)}`);
 
 const applyClosure = (proc: Closure, args: Value[]): Result<Value> => {
     const vars = map((v: VarDecl) => v.var, proc.params);
@@ -82,17 +75,15 @@ const evalCExps = (first: Exp, rest: Exp[], env: Env): Result<Value> =>
     isCExp(first) ? bind(applicativeEval(first, env), _ => evalSequence(rest, env)) :
     first;
 
-const evalDefineExps = (def: DefineExp, exps: Exp[]): Result<Value> =>
-{
-    
-    const index : number = unbox(theStore.vals).length;
-    return bind(applicativeEval(def.val, theGlobalEnv), (v : Value) => {
+const evalDefineExps = (def: DefineExp, exps: Exp[]): Result<Value> => 
+    bind(applicativeEval(def.val, theGlobalEnv), (v : Value) => {
+        const index : number = unbox(theStore.vals).length;
         globalEnvAddBinding(def.var.var, index);
         extendStore(theStore, v);
         return exps.length != 0 ? evalSequence(exps, theGlobalEnv) : makeOk(undefined)
     })
     
-}
+
 // Main program
 // L2-BOX @@ Use GE instead of empty-env
 export const evalProgram = (program: Program): Result<Value> =>
@@ -115,5 +106,3 @@ const evalLet = (exp: LetExp, env: Env): Result<Value> => {
         return evalSequence(exp.body, newEnv);
     })
 }
-
-// (let (a 5)(lamba () (...)) => ((lambda (a) (...))5)
