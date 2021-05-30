@@ -9,24 +9,34 @@ type PromisedStore<K, V> = {
 }
 
 
-// export function makePromisedStore<K, V>(): PromisedStore<K, V> {
-//     ???
-//     return {
-//         get(key: K) {
-//             ???
-//         },
-//         set(key: K, value: V) {
-//             ???
-//         },
-//         delete(key: K) {
-//             ???
-//         },
-//     }
-// }
+export function makePromisedStore<K, V>(): PromisedStore<K, V> {
+    const store = new Map<K,V>();
+    return {
+        get(key: K) : Promise<V> {
+            return new Promise<V>((resolve, reject) => {
+                const a = store.get(key)
+                a != undefined ? resolve(a) : reject(MISSING_KEY) 
+            })
+        },
+        set(key: K, value: V) : Promise<void> {
+            return new Promise<void>((resolve, reject) => {
+                store.set(key, value)
+            })
+        },
+        delete(key: K) : Promise<void> {
+            return new Promise<void>((resolve, reject) => {
+                store.delete(key) ? resolve() : reject(MISSING_KEY)
+            })
+        },
+    }
+}
 
-// export function getAll<K, V>(store: PromisedStore<K, V>, keys: K[]): ??? {
-//     ???
-// }
+export function getAll<K, V>(store: PromisedStore<K, V>, keys: K[]): Promise<K[]> {
+    return new Promise<K[]>((resolve, reject) => {
+    const a : K[] = []
+    keys.map((key: K)=>store.get(key),)
+    })
+}
 
 /* 2.2 */
 
@@ -38,61 +48,17 @@ type PromisedStore<K, V> = {
 
 /* 2.3 */
 
-export function lazyFilter<T>(genFn: () => Generator<T>, filterFn: (param: T) => boolean) : () => Generator<T> {
-    return function * f () 
-    {
-        for (const next of genFn())
-        {
-            if (filterFn(next))
-            {
-                {yield next}
-            }
-        }
-    }
-}
+// export function lazyFilter<T>(genFn: () => Generator<T>, filterFn: ???): ??? {
+//     ???
+// }
 
-export function lazyMap<T, R>(genFn: () => Generator<T>, mapFn: (param: T) => T): () => Generator<T> {
-    return function * f () : Generator<T>
-    {
-        for (const next of genFn())
-        {
-            {yield mapFn(next)}
-        }
-    }
-}
+// export function lazyMap<T, R>(genFn: () => Generator<T>, mapFn: ???): ??? {
+//     ???
+// }
 
 /* 2.4 */
 // you can use 'any' in this question
 
-export async function asyncWaterfallWithRetry(fns: [() => Promise<any>, ...((param: any) => Promise<any>)[]]): Promise<any> {
-    let x: any = undefined
-    let y : any
-    for (const func of fns)
-    {
-        try
-        {
-            y = await func(x)
-        }
-        catch 
-        {
-            try
-            {
-                y = await new Promise((resolve) => setTimeout(()=> resolve(func(x)), 2000))
-            }
-            catch
-            {
-                try 
-                {
-                    y = await new Promise((resolve) => setTimeout(()=> resolve(func(x)), 2000))
-                }
-                catch (err)
-                {
-                    throw err
-                }
-            }
-            
-        }
-        x = y
-    }
-    return x
-}
+// export async function asyncWaterfallWithRetry(fns: [() => Promise<any>, ...(???)[]]): Promise<any> {
+//     ???
+// }
