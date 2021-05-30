@@ -21,6 +21,7 @@ export function makePromisedStore<K, V>(): PromisedStore<K, V> {
         set(key: K, value: V) : Promise<void> {
             return new Promise<void>((resolve, reject) => {
                 store.set(key, value)
+                console.log(store)
             })
         },
         delete(key: K) : Promise<void> {
@@ -31,10 +32,10 @@ export function makePromisedStore<K, V>(): PromisedStore<K, V> {
     }
 }
 
-export function getAll<K, V>(store: PromisedStore<K, V>, keys: K[]): Promise<K[]> {
-    return new Promise<K[]>((resolve, reject) => {
-    const a : K[] = []
-    keys.map((key: K)=>store.get(key),)
+export function getAll<K, V>(store: PromisedStore<K, V>, keys: K[]): Promise<V[]> {
+    return new Promise<V[]>((resolve, reject) => {
+    const a : V[] = []
+    keys.map((key: K) => store.get(key).then((value)=>a.concat(value)).catch((err)=>err))
     })
 }
 
