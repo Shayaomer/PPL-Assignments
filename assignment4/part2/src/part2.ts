@@ -39,7 +39,7 @@ type PromisedStore<K, V> = {
 /* 2.3 */
 
 export function lazyFilter<T>(genFn: () => Generator<T>, filterFn: (param: T) => boolean) : () => Generator<T> {
-    return function * f () 
+    return function * () : Generator<T>
     {
         for (const next of genFn())
         {
@@ -52,7 +52,7 @@ export function lazyFilter<T>(genFn: () => Generator<T>, filterFn: (param: T) =>
 }
 
 export function lazyMap<T, R>(genFn: () => Generator<T>, mapFn: (param: T) => T): () => Generator<T> {
-    return function * f () : Generator<T>
+    return function * () : Generator<T>
     {
         for (const next of genFn())
         {
