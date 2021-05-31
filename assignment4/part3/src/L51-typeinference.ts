@@ -260,14 +260,16 @@ const typeofProgramExps = (exp: A.Exp, exps: A.Exp[], tenv: E.TEnv): Result<T.TE
 //      - for a symbol - record the value of the symbol in the SymbolTExp
 //        so that precise type checking can be made on ground symbol values.
 export const typeofLit = (exp: A.LitExp): Result<T.TExp> =>
-    makeFailure(`TODO typeofLit`);
+    V.isSymbolSExp(exp.val)? makeOk(T.makeSymbolTExp()) : 
+        V.isCompoundSExp(exp.val) ? makeOk(T.makePairTExp()) : 
+    makeFailure("Not a literal exp")
 
 // Purpose: compute the type of a set! expression
 // Typing rule:
 //   (set! var val)
 // TODO - write the typing rule for set-exp
 export const typeofSet = (exp: A.SetExp, tenv: E.TEnv): Result<T.VoidTExp> => {
-    return makeFailure('TODO typeofSet');
+    return typeofExp(exp.val, tenv) == typeofExp(exp.var, tenv) ? makeOk(T.makeVoidTExp()) : makeFailure("Value and Variable are not of same type ")
 };
 
 // Purpose: compute the type of a class-exp(type fields methods)
