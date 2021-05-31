@@ -77,24 +77,23 @@ export function lazyMap<T, R>(genFn: () => Generator<T>, mapFn: (param: T) => T)
 
 export async function asyncWaterfallWithRetry(fns: [() => Promise<any>, ...((param: any) => Promise<any>)[]]): Promise<any> {
     let x: any = undefined
-    let y : any
     for (const func of fns)
     {
         try
         {
-            y = await func(x)
+            x = await func(x)
         }
         catch 
         {
             try
             {
-                y = await new Promise((resolve) => setTimeout(()=> resolve(func(x)), 2000))
+                x = await new Promise((resolve) => setTimeout(()=> resolve(func(x)), 2000))
             }
             catch
             {
                 try 
                 {
-                    y = await new Promise((resolve) => setTimeout(()=> resolve(func(x)), 2000))
+                    x = await new Promise((resolve) => setTimeout(()=> resolve(func(x)), 2000))
                 }
                 catch (err)
                 {
@@ -103,7 +102,6 @@ export async function asyncWaterfallWithRetry(fns: [() => Promise<any>, ...((par
             }
 
         }
-        x = y
     }
     return x
 } 
