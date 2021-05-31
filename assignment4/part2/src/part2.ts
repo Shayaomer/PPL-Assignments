@@ -9,24 +9,35 @@ type PromisedStore<K, V> = {
 }
 
 
-// export function makePromisedStore<K, V>(): PromisedStore<K, V> {
-//     ???
-//     return {
-//         get(key: K) {
-//             ???
-//         },
-//         set(key: K, value: V) {
-//             ???
-//         },
-//         delete(key: K) {
-//             ???
-//         },
-//     }
-// }
+export function makePromisedStore<K, V>(): PromisedStore<K, V> {
+    const store = new Map<K,V>();
+    return {
+        get(key: K) : Promise<V> {
+            return new Promise<V>((resolve, reject) => {
+                const a = store.get(key)
+                a != undefined ? resolve(a) : reject(MISSING_KEY) 
+            })
+        },
+        set(key: K, value: V) : Promise<void> {
+            return new Promise<void>((resolve, reject) => {
+                store.set(key, value)
+                console.log(store)
+            })
+        },
+        delete(key: K) : Promise<void> {
+            return new Promise<void>((resolve, reject) => {
+                store.delete(key) ? resolve() : reject(MISSING_KEY)
+            })
+        },
+    }
+}
 
-// export function getAll<K, V>(store: PromisedStore<K, V>, keys: K[]): ??? {
-//     ???
-// }
+export function getAll<K, V>(store: PromisedStore<K, V>, keys: K[]): Promise<V[]> {
+    return new Promise<V[]>((resolve, reject) => {
+    const a : V[] = []
+    keys.map((key: K) => store.get(key).then((value)=>a.concat(value)).catch((err)=>err))
+    })
+}
 
 /* 2.2 */
 
@@ -64,35 +75,6 @@ export function lazyMap<T, R>(genFn: () => Generator<T>, mapFn: (param: T) => T)
 /* 2.4 */
 // you can use 'any' in this question
 
-export async function asyncWaterfallWithRetry(fns: [() => Promise<any>, ...((param: any) => Promise<any>)[]]): Promise<any> {
-    let x: any = undefined
-    let y : any
-    for (const func of fns)
-    {
-        try
-        {
-            y = await func(x)
-        }
-        catch 
-        {
-            try
-            {
-                y = await new Promise((resolve) => setTimeout(()=> resolve(func(x)), 2000))
-            }
-            catch
-            {
-                try 
-                {
-                    y = await new Promise((resolve) => setTimeout(()=> resolve(func(x)), 2000))
-                }
-                catch (err)
-                {
-                    throw err
-                }
-            }
-            
-        }
-        x = y
-    }
-    return x
-}
+// export async function asyncWaterfallWithRetry(fns: [() => Promise<any>, ...(???)[]]): Promise<any> {
+//     ???
+// }
