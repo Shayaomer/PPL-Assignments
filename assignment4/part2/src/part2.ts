@@ -15,13 +15,13 @@ export function makePromisedStore<K, V>(): PromisedStore<K, V> {
         get(key: K) : Promise<V> {
             return new Promise<V>((resolve, reject) => {
                 const a = store.get(key)
-                a != undefined ? resolve(a) : reject(MISSING_KEY) 
+                a === undefined ? reject(MISSING_KEY) : resolve(a)   
             })
         },
         set(key: K, value: V) : Promise<void> {
             return new Promise<void>((resolve, reject) => {
                 store.set(key, value)
-                console.log(store)
+                resolve()
             })
         },
         delete(key: K) : Promise<void> {
