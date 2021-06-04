@@ -33,13 +33,9 @@ export function makePromisedStore<K, V>(): PromisedStore<K, V> {
 }
 
 export function getAll<K, V>(store: PromisedStore<K, V>, keys: K[]): Promise<V[]> {
-    return new Promise<V[]>((resolve, reject) => {
-        const a : V[] = []
-        keys.map((key : K) => store.get(key)
-        .then((value : V) => a.push(value))
-        .catch((err) => reject(err)))
-        resolve(a)
-    })
+    const a = keys.map((key : K) => store.get(key)
+    .catch((err) => Promise.reject(err)))
+    return Promise.all(a)
 }
 
 /* 2.2 */

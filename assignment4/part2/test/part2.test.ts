@@ -13,7 +13,6 @@ describe('2.1 (PromisedStore)', () => {
         const store = makePromisedStore()
         await store.set('a', 42)
         const a = await store.get('a')
-        console.log("a is: ", a)
         expect(a).to.equal(42)
     })
 
