@@ -37,8 +37,7 @@ export function getAll<K, V>(store: PromisedStore<K, V>, keys: K[]): Promise<V[]
         const a : V[] = []
         keys.map((key : K) => store.get(key)
         .then((value : V) => a.push(value))
-        .catch((err) => { reject(err)
-            console.log("IM HERE")}))
+        .catch((err) => reject(err)))
         resolve(a)
     })
 }
