@@ -40,8 +40,6 @@ export function getAll<K, V>(store: PromisedStore<K, V>, keys: K[]): Promise<V[]
 
 /* 2.2 */
 
-// ??? (you may want to add helper functions here)
-
 export async function storing<T,R>(store : PromisedStore<T,R>, param: T, f: (param: T) => R) : Promise<R> {
     try{
         const value = await store.get(param)
