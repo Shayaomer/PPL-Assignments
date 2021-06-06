@@ -12,7 +12,7 @@ import { allT, first, rest, second, isEmpty } from '../shared/list';
 import { parse as p, isToken, isSexpString } from "../shared/parser";
 import { Result, bind, makeFailure, mapResult, makeOk, safe2, safe3 } from "../shared/result";
 import { isArray, isString, isNumericString, isIdentifier } from "../shared/type-predicates";
-import { isTVar, makeFreshTVar, makeTVar, parseTExp, unparseTExp, TVar, TExp } from './TExp51';
+import { isTVar, makeFreshTVar, makeTVar, parseTExp, unparseTExp, TVar, TExp, parseTE } from './TExp51';
 import { makeClassTExp, ClassTExp } from "./TExp51";
 
 /*
@@ -335,8 +335,19 @@ const parseClassExp = (params: Sexp[]): Result<ClassExp> =>
     (params.length != 4) || (params[0] != ':') ? makeFailure(`class must have shape (class [: <type>]? <fields> <methods>) - got ${params.length} params instead`) :
     parseGoodClassExp(params[1], params[2], params[3]);
 
-const parseGoodClassExp = (typeName: Sexp, varDecls: Sexp, bindings: Sexp): Result<ClassExp> =>
-    makeFailure("TODO parseGoodClassExp");
+const parseGoodClassExp = (typeName: Sexp, varDecls: Sexp, bindings: Sexp): Result<ClassExp> => {
+    const typeNameTE = parseTExp(typeName)
+    if(isArray(varDecls) && isGoodBindings(bindings)){
+        const args = mapResult(parseVarDecl, varDecls);
+        const binds = parseBindings(bindings)
+        return bind(typeNameTE, (typeNameTE) => isTVar(typeNameTE) ?  safe3((typeName : TVar, vars : VarDecl[], bindings : Binding[]) => makeOk(makeClassExp(typeName, vars, bindings)))(makeOk(typeNameTE), args, binds) : 
+        makeFailure(`${typeNameTE.tag}is not a Tvar`))
+    }
+    return makeFailure("invalid arguments")
+} 
+
+
+
 
 // sexps has the shape (quote <sexp>)
 export const parseLitExp = (param: Sexp): Result<LitExp> =>
@@ -449,7 +460,8 @@ const unparseClassExp = (ce: ClassExp, unparseWithTVars?: boolean): Result<strin
 // Collect class expressions in parsed AST so that they can be passed to the type inference module
 
 export const parsedToClassExps = (p: Parsed): ClassExp[] => 
-    // TODO parsedToClassExps
+    isClassExp(p) ? [p] :
+    isProgram(p) ? p.exps.map((exp) => parsedToClassExps(exp)).reduce((acc, curr) => acc.concat(curr)) : 
     [];
 
 // L51 

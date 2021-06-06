@@ -103,8 +103,10 @@ const checkNoOccurrence = (tvar: T.TVar, te: T.TExp, exp: A.Exp): Result<true> =
 // so that the user defined types are known to the type inference system.
 // For each class (class : typename ...) add a pair <class.typename classTExp> to TEnv
 export const makeTEnvFromClasses = (parsed: A.Parsed): E.TEnv => {
-    // TODO makeTEnvFromClasses
-    return E.makeEmptyTEnv();
+    const classExps = A.parsedToClassExps(parsed)
+    const typeNames = classExps.map((elem) => elem.typeName.var )
+    const classTExps = classExps.map((elem) => A.classExpToClassTExp(elem))
+    return E.makeExtendTEnv(typeNames, classTExps, E.makeEmptyTEnv())
 }
 
 // Purpose: Compute the type of a concrete expression
@@ -181,11 +183,20 @@ export const typeofProc = (proc: A.ProcExp, tenv: E.TEnv): Result<T.TExp> => {
 // then type<(rator rand1...randn)>(tenv) = t
 // NOTE: This procedure is different from the one in L5-typecheck
 export const typeofApp = (app: A.AppExp, tenv: E.TEnv): Result<T.TExp> => {
+    // if (A.isClassExp(app.rator)){
+    //     const methods = mapResult((x) => typeofExp(x.val, tenv), app.rator.methods)
+    //     const names = R.map((x) => x.var.var, app.rator.methods)
+    //     safe2()
+    //     const newEnv : E.TEnv = E.makeExtendTEnv()
+                                                            //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+    //     return typeofExp(app.rands[0], newEnv)
+    //     }
     const ratorTE = typeofExp(app.rator, tenv);
     const randsTE = mapResult((rand) => typeofExp(rand, tenv), app.rands);
     const returnTE = T.makeFreshTVar();
     const constraint = safe2((ratorTE: T.TExp, randsTE: T.TExp[]) => checkEqualType(ratorTE, T.makeProcTExp(randsTE, returnTE), app))(ratorTE, randsTE);
     return bind(constraint, _ => makeOk(returnTE));
+    
 };
 
 // Purpose: compute the type of a let-exp
@@ -242,7 +253,6 @@ export const typeofLetrec = (exp: A.LetrecExp, tenv: E.TEnv): Result<T.TExp> => 
 // TODO - write the typing rule for define-exp
 export const typeofDefine = (exp: A.DefineExp, tenv: E.TEnv): Result<T.VoidTExp> => {
     const constraint1 = bind(typeofExp(exp.val, tenv), (valTE: T.TExp) => checkEqualType(valTE, exp.var.texp, exp));
-    bind(typeofExp(exp.val, tenv), (val : T.TExp) => makeOk(globalEnvAddBinding(exp.var.var, val.tag))) // ??????????????????????????
     return bind(constraint1, () => makeOk({ tag: "VoidTExp" }))
 
 };
@@ -256,7 +266,10 @@ export const typeofProgram = (exp: A.Program, tenv: E.TEnv): Result<T.TExp> =>
     typeofProgramExps(first(exp.exps), rest(exp.exps), tenv);
 
 const typeofProgramExps = (exp: A.Exp, exps: A.Exp[], tenv: E.TEnv): Result<T.TExp> => 
-    makeFailure('TODO typeofProgramExps');
+exps.length === 0 ? typeofExp(exp, tenv) : 
+    A.isDefineExp(exp) ? bind (typeofExp(exp.val, E.makeExtendTEnv([exp.var.var], [exp.var.texp], tenv)), (type :T.TExp) => 
+        typeofProgramExps(first(exps), rest(exps), E.makeExtendTEnv([exp.var.var], [type], tenv))) : 
+            typeofProgramExps(first(exps), rest(exps), tenv)
 
 
 // Purpose: compute the type of a literal expression
@@ -273,7 +286,11 @@ export const typeofLit = (exp: A.LitExp): Result<T.TExp> =>
 //   (set! var val)
 // TODO - write the typing rule for set-exp
 export const typeofSet = (exp: A.SetExp, tenv: E.TEnv): Result<T.VoidTExp> => {
-    return typeofExp(exp.val, tenv) == typeofExp(exp.var, tenv) ? makeOk(T.makeVoidTExp()) : makeFailure("Value and Variable are not of same type ")
+    const varTE = typeofExp(exp.var, tenv)
+    const valTE = typeofExp(exp.val, tenv)
+    const constraint = safe2((varTe: T.TExp, valTE: T.TExp) => checkEqualType(varTe, valTE, exp))(varTE, valTE);
+
+    return bind(constraint, _ => makeOk(T.makeVoidTExp()))
 };
 
 // Purpose: compute the type of a class-exp(type fields methods)
@@ -284,5 +301,16 @@ export const typeofSet = (exp: A.SetExp, tenv: E.TEnv): Result<T.VoidTExp> => {
 //      type<method_k>(class-tenv) = mk
 // Then type<class(type fields methods)>(tend) = = [t1 * ... * tn -> type]
 export const typeofClass = (exp: A.ClassExp, tenv: E.TEnv): Result<T.TExp> => {
-    return makeFailure("TODO typeofClass");
+    console.log(exp.methods)
+    const fieldNames = R.map((x) => x.var, exp.fields)
+    const fieldTypes = R.map((x) => x.texp, exp.fields)
+    const methods = mapResult((x) => typeofExp(x.val, E.makeExtendTEnv(fieldNames, fieldTypes, tenv)), exp.methods)
+    const types = R.map((x) => T.isTVar(x.var.texp) ? x.var.texp.var : "" , exp.methods)
+    console.log(types)
+    // // console.log(bind(methods, (meth) => makeOk(meth[0])))
+    // const classTE = E.applyTEnv(tenv, exp.typeName.var)
+    // // console.log(bind(classTE, (te) => T.isClassTExp(te)? makeOk(te.methods) : makeFailure("Fdf")))
+    const er = bind(methods, (meth) => E.applyTEnv(E.makeExtendTEnv(types, meth, tenv), exp.typeName.var))
+    return er
 };
+
