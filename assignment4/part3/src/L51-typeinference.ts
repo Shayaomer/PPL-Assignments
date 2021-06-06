@@ -9,6 +9,7 @@ import * as T from "./TExp51";
 import { allT, first, rest, isEmpty } from "../shared/list";
 import { isNumber, isString } from '../shared/type-predicates';
 import { Result, makeFailure, makeOk, bind, safe2, zipWithResult, mapResult } from "../shared/result";
+import { globalEnvAddBinding, theGlobalEnv } from "../imp/L5-env";
 
 // Purpose: Make type expressions equivalent by deriving a unifier
 // Return an error if the types are not unifiable.
@@ -240,7 +241,10 @@ export const typeofLetrec = (exp: A.LetrecExp, tenv: E.TEnv): Result<T.TExp> => 
 //   (define (var : texp) val)
 // TODO - write the typing rule for define-exp
 export const typeofDefine = (exp: A.DefineExp, tenv: E.TEnv): Result<T.VoidTExp> => {
-    return makeFailure('TODO typeofDefine');
+    const constraint1 = bind(typeofExp(exp.val, tenv), (valTE: T.TExp) => checkEqualType(valTE, exp.var.texp, exp));
+    bind(typeofExp(exp.val, tenv), (val : T.TExp) => makeOk(globalEnvAddBinding(exp.var.var, val.tag))) // ??????????????????????????
+    return bind(constraint1, () => makeOk({ tag: "VoidTExp" }))
+
 };
 
 // Purpose: compute the type of a program
