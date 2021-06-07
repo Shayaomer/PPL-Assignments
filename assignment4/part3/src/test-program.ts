@@ -107,7 +107,6 @@ const expected9 = '((class cell (get : (Empty -> T))) -> (Empty -> T))';
 
 
 const doIt = (program: string, expected: string) => {
-    console.log('----------------------');
     const p = A.parse(program);
     const t = Res.bind(p, p => {
         const tenv = I.makeTEnvFromClasses(p);

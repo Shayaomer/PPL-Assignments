@@ -460,9 +460,11 @@ const unparseClassExp = (ce: ClassExp, unparseWithTVars?: boolean): Result<strin
 // Collect class expressions in parsed AST so that they can be passed to the type inference module
 
 export const parsedToClassExps = (p: Parsed): ClassExp[] => 
+    isDefineExp(p) ?  parsedToClassExps(p.val) :
     isClassExp(p) ? [p] :
     isProgram(p) ? p.exps.map((exp) => parsedToClassExps(exp)).reduce((acc, curr) => acc.concat(curr)) : 
     [];
+
 
 // L51 
 export const classExpToClassTExp = (ce: ClassExp): ClassTExp => 
