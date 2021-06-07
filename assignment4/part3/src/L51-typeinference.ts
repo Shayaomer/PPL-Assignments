@@ -287,7 +287,7 @@ export const typeofSet = (exp: A.SetExp, tenv: E.TEnv): Result<T.VoidTExp> => {
 
     return bind(constraint, _ => makeOk(T.makeVoidTExp()))
 };
-const util = require('util')
+
 // Purpose: compute the type of a class-exp(type fields methods)
 // Typing rule:
 // let class-tenv = extend-tenv(field1=t1,...,fieldn=tn)
