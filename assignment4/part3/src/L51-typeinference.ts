@@ -306,11 +306,7 @@ export const typeofClass = (exp: A.ClassExp, tenv: E.TEnv): Result<T.TExp> => {
     
     const constraint  = bind(methodTEs, (types) => checkEqualTypes(varTEs, types, exp))
     const classTE = T.makeClassTExp(exp.typeName.var, R.zipWith((name, type) => [name, type], vars, varTEs))
-    const x = bind(constraint, _ => makeOk(T.makeProcTExp(fieldTypes, classTE)))
-
-    return x
-
-
+    return bind(constraint, _ => makeOk(T.makeProcTExp(fieldTypes, classTE)))
 
 };
 
