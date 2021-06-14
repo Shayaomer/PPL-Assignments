@@ -50,7 +50,15 @@
 (define leaf? (lambda (x) (not (list? x))))
 (define equal-trees$ 
  (lambda (tree1 tree2 succ fail)
-   #f;@TODO
+  (cond
+    ((and (empty? tree1) (empty? tree2)) (succ '()))
+    ((and (not (list? tree1)) (not (list? tree2))) (succ (cons tree1 tree2)))
+    ((and (list? tree1) (list? tree2)) 
+      (equal-trees$ (car tree1) (car tree2) (lambda (car-tree) 
+        (succ (cons car-tree (equal-trees$ (cdr tree1) (cdr tree2) succ fail)))) fail)
+    )
+    (else (fail (cons tree1 tree2)))
+  )
  )
 )
 
@@ -60,7 +68,10 @@
 ; Purpose: Returns the reduced value of the given lazy list
 (define reduce1-lzl 
   (lambda (reducer init lzl)
-   #f ;@TODO
+    (cond 
+      ((empty-lzl? lzl) init)
+      (else (reduce1-lzl reducer (reducer init (head lzl)) (tail lzl)))
+    )
   )
 )  
 
@@ -70,7 +81,11 @@
 ; Purpose: Returns the reduced value of the first n items in the given lazy list
 (define reduce2-lzl 
   (lambda (reducer init lzl n)
-    #f ;@TODO
+    (cond 
+      ((= n 0) init)
+      ((empty-lzl? lzl) init)
+    (else (reduce2-lzl reducer (reducer init (head lzl)) (tail lzl) (- n 1)))
+    )
   )
 )  
 
@@ -80,7 +95,10 @@
 ; Purpose: Returns the reduced values of the given lazy list items as a lazy list
 (define reduce3-lzl 
   (lambda (reducer init lzl)
-    #f ;@TODO
+    (cond 
+      ((empty-lzl? lzl) init)
+      (else (cons-lzl (reducer init (head lzl)) (lambda () (reduce3-lzl reducer (reducer init (head lzl)) (tail lzl)))))
+    )
   )
 )  
  
