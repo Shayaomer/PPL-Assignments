@@ -55,7 +55,7 @@
     ((and (not (list? tree1)) (not (list? tree2))) (succ (cons tree1 tree2)))
     ((and (list? tree1) (list? tree2)) 
       (equal-trees$ (car tree1) (car tree2) (lambda (car-tree) 
-        (succ (cons car-tree (equal-trees$ (cdr tree1) (cdr tree2) succ fail)))) fail)
+        (equal-trees$ (cdr tree1) (cdr tree2) (lambda (cdr-tree) (succ (cons car-tree cdr-tree))) fail)) fail)
     )
     (else (fail (cons tree1 tree2)))
   )
