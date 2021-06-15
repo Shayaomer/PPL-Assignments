@@ -150,7 +150,6 @@
    )
  )
 
-(take (generate-pi-approximations) 20)
 
 
  
