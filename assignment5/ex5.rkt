@@ -114,8 +114,31 @@
   (lambda (from step)
     (cons-lzl from (lambda () (integers-steps-from (+ from step) step)))))
 
-;;;Test for integers-steps-from:
-;(take (integers-steps-from 4 2)8)
+;;;Helping methods for 2.f:
+
+;; Signature: lzl-map(f, lz)
+;; Type: [[T1 -> T2] * Lzl(T1) -> Lzl(T2)]
+(define lzl-map
+  (lambda (f lzl)
+    (if (empty-lzl? lzl)
+        lzl
+        (cons-lzl (f (head lzl))
+                  (lambda () (lzl-map f (tail lzl)))))))
+
+;; Objects for the pi-lzl method
+(define lhs-lzl
+    (integers-steps-from 1 4))
+(define rhs-lzl
+    (integers-steps-from 3 4))
+
+;; Signature: pi-lzl(l-lzl, r-lzl)
+;; Type: [Lzl<Number> * Lzl<Number> -> Lzl<Number>]
+;; Purpouse: Calculating the items of the approximation as a lazy-list
+(define pi-lzl
+  (lambda (l-lzl r-lzl)
+    (cons-lzl (/ 1 (* (head l-lzl) (head r-lzl))) (lambda ()
+                         (pi-lzl (tail l-lzl) (tail r-lzl))))))
+
 
 ;;; Q2f
 ; Signature: generate-pi-approximations() 
@@ -123,6 +146,13 @@
 ; Purpose: Returns the approximations of pi as a lazy list
 (define generate-pi-approximations
   (lambda ()
-    #f ; @TODO
+    (reduce3-lzl + 0 (lzl-map (lambda (x) (* 8 x)) (pi-lzl lhs-lzl rhs-lzl))) 
    )
  )
+
+(take (generate-pi-approximations) 20)
+
+
+ 
+
+   
