@@ -112,9 +112,10 @@
 ; Purpose: Returns a list of integers from 'from' with 'steps' jumps
 (define integers-steps-from
   (lambda (from step)
-    #f ; @TODO
-  )
-)
+    (cons-lzl from (lambda () (integers-steps-from (+ from step) step)))))
+
+;;;Test for integers-steps-from:
+;(take (integers-steps-from 4 2)8)
 
 ;;; Q2f
 ; Signature: generate-pi-approximations() 
