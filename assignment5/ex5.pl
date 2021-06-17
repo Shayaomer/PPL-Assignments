@@ -40,3 +40,34 @@ book("The Lord of the Rings", 4, 4, 1250).
 
 % You can add more facts.
 % Fill in the Purpose, Signature as requested in the instructions here
+
+% Signature: authorOfGenre(Genre, Author)/2
+% Purpose: Author has a book of genre Genre.
+authorOfGenre(GenreName, AuthorName):- 
+	book(_, X, Y, _), 
+	author(X, AuthorName), 
+	genre(Y, GenreName).
+
+% Signature: authorBookLength(Author, Length)/2
+% Purpose: Author has a book of length Length.
+authorBookLength(AuthorID, Length):- book(_, AuthorID, _, Length).
+
+% Signature: bookLength(Book, Length)/2
+% Purpose: Book has a length of Length.
+bookLength(BookName, X):- book(BookName, _, _, X).
+
+% Signature: longestBook(Author, Book)/2
+% Purpose: Book is Author's longest book.
+longestBook(AuthorID, BookName) :- 
+	book(BookName, AuthorID, _, _), 
+	findall(BookLength, authorBookLength(AuthorID,BookLength), BookLengths), 
+	bookLength(BookName, Length), 
+	max_list(BookLengths, Length).
+
+% Signature: versatileAuthor(Author)/1
+% Purpose: Author has books of at least three differet genres.
+versatileAuthor(AuthorName):-
+    findall(Genre, authorOfGenre(Genre, AuthorName), GenreList), 
+    sort(GenreList, GenreListNoDups), 
+    length(GenreListNoDups, Length), 
+    Length >= 3.
